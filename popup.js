@@ -55,6 +55,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const requirementsDiv = document.getElementById('requirements');
   const crackTimeDiv = document.getElementById('crackTime');
   const testButton = document.getElementById('test-button');
+  const strengthIndicator = document.getElementById('strength-indicator');
+  const feedbackList = document.getElementById('feedback-list');
+  const requirementsList = document.getElementById('requirements-list');
 
   console.log('Elements found:', {
     passwordInput: !!passwordInput,
@@ -102,6 +105,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Function to test password
   async function testPassword(password) {
     console.log('Running password test');
+    const username = usernameInput.value;
+    
+    if (!password) {
+      updateResults('Please enter a password to test');
+      return;
+    }
+
+    // Additional checks for password containing username
+    if (username && password.toLowerCase().includes(username.toLowerCase())) {
+      updateResults('Password should not contain your username', 'weak');
+      return;
+    }
+
     const result = checkPasswordStrength(password);
     console.log('Test result:', result);
     updateStrengthIndicator(result.strength);
@@ -224,20 +240,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Function to update strength indicator
   function updateStrengthIndicator(strength) {
-    const indicator = document.getElementById('strength-indicator');
-    indicator.className = `strength-indicator ${strength.toLowerCase()}`;
-    indicator.textContent = strength;
+    strengthIndicator.className = `strength-indicator ${strength.toLowerCase()}`;
+    strengthIndicator.textContent = strength;
   }
 
   // Function to update feedback
   function updateFeedback(feedback) {
-    const feedbackList = document.getElementById('feedback-list');
     feedbackList.innerHTML = '';
     feedback.forEach(item => {
       const li = document.createElement('li');
       li.textContent = item;
       feedbackList.appendChild(li);
     });
+  }
+
+  // Function to update results
+  function updateResults(message, strength = '') {
+    strengthIndicator.className = `strength-indicator ${strength}`;
+    strengthIndicator.textContent = message;
   }
 
   // Listen for messages from content script
@@ -253,6 +273,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         return true;
       }
+    }
+
+    if (message.action === 'openPasswordTester') {
+      console.log('Received password test request:', message);
+      if (message.password) {
+        passwordInput.value = message.password;
+      }
+      if (message.username) {
+        usernameInput.value = message.username;
+      }
+      // Trigger password test
+      testPassword();
     }
   });
 

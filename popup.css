@@ -50,25 +50,36 @@ h1, h2, h3, h4, h5 {
 }
 
 /* Input styles */
-.input-group {
-  margin-bottom: 16px;
+.input-section {
+  margin: 20px 0;
 }
 
-input[type="text"],
-input[type="password"] {
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.input-group input {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #444;
   border-radius: 4px;
-  background-color: var(--input-bg);
-  color: var(--text-primary);
-  margin-top: 4px;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+.input-group input:focus {
   outline: none;
-  border-color: var(--accent-color);
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
 }
 
 /* Button styles */

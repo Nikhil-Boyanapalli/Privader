@@ -72,15 +72,16 @@
       </div>
     </div>
 
-    <div class="input-group">
-      <label for="username">Username/Email:</label>
-      <input type="text" id="username" placeholder="Enter username or email">
-    </div>
-
-    <div class="input-group">
-      <label for="password">Password:</label>
-      <input type="password" id="password" placeholder="Enter password">
-      <button id="test-button">Test Password</button>
+    <div class="input-section">
+      <div class="input-group">
+        <label for="username">Username/Email:</label>
+        <input type="text" id="username" placeholder="Enter username or email">
+      </div>
+      <div class="input-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter password">
+        <button id="test-button">Test Password</button>
+      </div>
     </div>
 
     <div class="strength-meter">
@@ -95,7 +96,7 @@
 
     <div class="requirements">
       <h3>Password Requirements:</h3>
-      <ul>
+      <ul id="requirements-list">
         <li>At least 8 characters long</li>
         <li>Contains uppercase letters</li>
         <li>Contains lowercase letters</li>

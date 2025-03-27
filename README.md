@@ -102,5 +102,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Your Name - your.email@example.com
-Project Link: [https://github.com/yourusername/privader-web-security](https://github.com/yourusername/privader-web-security) 
+Email: nikhilboyanapalli2@gmail.com
+Project Link: https://github.com/Nikhil-Boyanapalli/Privader
+
+## About
+
+A comprehensive privacy security tool 

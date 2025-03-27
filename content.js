@@ -91,6 +91,21 @@ function monitorPasswordFields() {
 // Start monitoring
 monitorPasswordFields();
 
+// Store username in session storage for multi-page forms
+document.addEventListener('input', function(e) {
+  if (e.target.type === 'text' || e.target.type === 'email') {
+    const inputValue = e.target.value;
+    // Check if this looks like a username/email field
+    if (e.target.name.toLowerCase().includes('user') || 
+        e.target.name.toLowerCase().includes('email') ||
+        e.target.id.toLowerCase().includes('user') ||
+        e.target.id.toLowerCase().includes('email')) {
+      // Store the username/email temporarily
+      sessionStorage.setItem('privader_temp_username', inputValue);
+    }
+  }
+});
+
 // Listen for password input changes
 document.addEventListener('input', function(e) {
   if (e.target.type === 'password') {
@@ -100,11 +115,16 @@ document.addEventListener('input', function(e) {
 
 // Function to handle password input
 async function handlePasswordInput(input) {
+  const domain = window.location.hostname;
+  
   // Check if site is already trusted
-  const isTrusted = await checkTrustedSite(window.location.href);
+  const isTrusted = await checkSiteTrust(domain);
   if (isTrusted) {
     return;
   }
+
+  // Get stored username if available
+  const storedUsername = sessionStorage.getItem('privader_temp_username') || '';
 
   // Create security check dialog
   const dialog = document.createElement('div');
@@ -112,7 +132,8 @@ async function handlePasswordInput(input) {
   dialog.innerHTML = `
     <div class="security-check-content">
       <h2>Site Security Check</h2>
-      <p>You're about to enter a password on ${window.location.hostname}.</p>
+      <p>You're about to enter a password on ${domain}.</p>
+      ${storedUsername ? `<p>Associated username/email: ${storedUsername}</p>` : ''}
       <button id="continueBtn">Continue</button>
       <div class="trust-option">
         <input type="checkbox" id="trustSite">
@@ -143,6 +164,10 @@ async function handlePasswordInput(input) {
       margin-top: 0;
       color: #2196f3;
     }
+    .security-check-content p {
+      margin: 10px 0;
+      color: #e0e0e0;
+    }
     .security-check-content button {
       background: #2196f3;
       color: white;
@@ -172,18 +197,18 @@ async function handlePasswordInput(input) {
 
   continueBtn.addEventListener('click', async () => {
     if (trustCheckbox.checked) {
-      // Send message to add site to trusted sites
-      await chrome.runtime.sendMessage({
-        action: 'trustSite',
-        url: window.location.href
-      });
+      // Save site as trusted
+      await saveTrustedSite(domain);
     }
     dialog.remove();
-    // Send password to extension for testing
+    // Send password and username to extension for testing
     chrome.runtime.sendMessage({
       action: 'openPasswordTester',
-      password: input.value
+      password: input.value,
+      username: storedUsername
     });
+    // Clear stored username after use
+    sessionStorage.removeItem('privader_temp_username');
   });
 }
 
