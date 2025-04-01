@@ -1,3 +1,54 @@
+// Import configuration
+import config from './config.js';
+
+// Initialize the extension
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Extension installed');
+});
+
+// Google Safe Browsing API configuration
+const SAFE_BROWSING_API_KEY = config.SAFE_BROWSING_API_KEY;
+const SAFE_BROWSING_API_URL = 'https://safebrowsing.googleapis.com/v4/threatMatches:find';
+
+// Function to check URL against Google Safe Browsing API
+async function checkUrlWithSafeBrowsing(url) {
+  try {
+    const response = await fetch(`${SAFE_BROWSING_API_URL}?key=${SAFE_BROWSING_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        client: {
+          clientId: 'privader-web-security',
+          clientVersion: '1.0.0'
+        },
+        threatInfo: {
+          threatTypes: [
+            'MALWARE',
+            'SOCIAL_ENGINEERING',
+            'UNWANTED_SOFTWARE',
+            'POTENTIALLY_HARMFUL_APPLICATION'
+          ],
+          platformTypes: ['ANY_PLATFORM'],
+          threatEntryTypes: ['URL'],
+          threatEntries: [{ url }]
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Safe Browsing API request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.matches ? data.matches : [];
+  } catch (error) {
+    console.error('Safe Browsing API error:', error);
+    return null;
+  }
+}
+
 // Listen for messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'openPopup') {
@@ -33,6 +84,91 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   return true;
 });
+
+// Function to validate URL
+function isValidUrl(urlString) {
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (error) {
+    return false;
+  }
+}
+
+// Function to check site safety
+async function checkSiteSafety(url) {
+  try {
+    // Handle empty or invalid URLs
+    if (!url || typeof url !== 'string') {
+      return {
+        status: 'Error',
+        level: 'warning',
+        details: 'Invalid URL provided'
+      };
+    }
+
+    // Add protocol if missing
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    // Validate URL
+    if (!isValidUrl(url)) {
+      return {
+        status: 'Error',
+        level: 'warning',
+        details: 'Invalid URL format'
+      };
+    }
+
+    const urlObj = new URL(url);
+    const isSecure = urlObj.protocol === 'https:';
+    
+    // Check with Google Safe Browsing API
+    const threats = await checkUrlWithSafeBrowsing(url);
+    
+    if (threats === null) {
+      // API error, fallback to basic check
+      if (!isSecure) {
+        return {
+          status: 'Warning',
+          level: 'warning',
+          details: 'Site does not use HTTPS'
+        };
+      }
+      return {
+        status: 'Unknown',
+        level: 'warning',
+        details: 'Could not verify site safety'
+      };
+    }
+    
+    if (threats.length > 0) {
+      // Site has threats
+      const threatTypes = threats.map(t => t.threatType).join(', ');
+      return {
+        status: 'Unsafe',
+        level: 'danger',
+        details: `Site flagged for: ${threatTypes}`
+      };
+    }
+    
+    // Site is safe
+    return {
+      status: 'Safe',
+      level: 'safe',
+      details: 'No threats detected'
+    };
+
+  } catch (error) {
+    console.error('Error checking site safety:', error);
+    return {
+      status: 'Error',
+      level: 'warning',
+      details: 'Could not check site safety'
+    };
+  }
+}
 
 // Function to check if a site is trusted
 async function checkTrustedSite(url) {
@@ -230,46 +366,6 @@ async function analyzePrivacyPolicy(text, domain) {
     concerns.forEach(async (concern) => {
       await storeWarning(domain, 'privacy_detail', concern);
     });
-  }
-}
-
-// Function to check site safety
-async function checkSiteSafety(urlString) {
-  try {
-    const url = new URL(urlString);
-    const isHTTPS = url.protocol === 'https:';
-    
-    // Only check SSL if it's HTTPS
-    const hasSSL = isHTTPS ? await checkSSLCertificate(url.hostname) : false;
-    
-    if (!isHTTPS) {
-      return {
-        status: 'Warning',
-        level: 'warning',
-        details: 'Security concerns: No HTTPS'
-      };
-    }
-    
-    if (!hasSSL) {
-      return {
-        status: 'Warning',
-        level: 'warning',
-        details: 'Security concerns: Invalid SSL certificate'
-      };
-    }
-    
-    return {
-      status: 'Safe',
-      level: 'safe',
-      details: 'Site uses secure connection (HTTPS)'
-    };
-  } catch (error) {
-    console.error('Safety check error:', error);
-    return {
-      status: 'Warning',
-      level: 'warning',
-      details: 'Unable to verify site safety'
-    };
   }
 }
 

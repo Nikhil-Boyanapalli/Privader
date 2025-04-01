@@ -1,86 +1,99 @@
 # Privader Web Security
 
-A comprehensive Chrome extension for web security, privacy monitoring, and password protection.
+A comprehensive Chrome extension for web security and privacy protection. This extension helps users identify potential privacy concerns, analyze privacy policies, and ensure safe browsing experiences.
 
 ## Features
 
-### Password Security
-- Password strength testing based on OWASP guidelines
-- Real-time password analysis
-- Custom password requirements validation
-- Protection against common password vulnerabilities
+### 1. Site Safety Check
+- Real-time website safety verification using Google Safe Browsing API
+- HTTPS connection validation
+- SSL certificate verification
+- Threat detection for malware, phishing, and unwanted software
 
-### Privacy Monitoring
-- Site safety analysis
-- Data collection tracking
-- Privacy policy analysis
-- Automatic privacy warnings
-- Recent privacy incidents tracking
+### 2. Privacy Policy Analysis
+- Automatic detection and analysis of website privacy policies
+- Classification of privacy concerns into high, medium, and low risk levels
+- Detection of concerning terms and practices
+- Clear visualization of privacy risks
 
-### Security Features
-- HTTPS verification
-- SSL certificate validation
-- Trusted sites management
-- Download monitoring
-- Privacy-focused web browsing
+### 3. Data Collection Monitoring
+- Tracks potential data collection activities
+- Monitors form submissions and data transfers
+- Alerts for suspicious data gathering
+
+### 4. Password Security
+- Password strength testing
+- Common vulnerability checks
+- Secure password recommendations
+- Protection against password-based attacks
 
 ## Installation
 
-1. Clone this repository:
+1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/privader-web-security.git
+git clone [your-repo-url]
+cd privader-web-security
 ```
 
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode" in the top right
-4. Click "Load unpacked" and select the extension directory
+2. Install dependencies:
+```bash
+npm install
+```
 
-## Usage
+3. Set up API keys:
+- Rename `config.template.js` to `config.js`
+- Add your Google Safe Browsing API key (Get one from [Google Cloud Console](https://console.cloud.google.com/apis/credentials))
 
-### Password Testing
-1. Click the extension icon in your browser
-2. Enter the username/email and password
-3. View the password strength analysis and recommendations
+4. Build the extension:
+```bash
+npm run build
+```
 
-### Privacy Monitoring
-- The extension automatically monitors sites for privacy concerns
-- View the Privacy Status section for:
-  - Site Safety status
-  - Data Collection monitoring
-  - Privacy Policy analysis
-
-### Managing Trusted Sites
-1. Click "Manage Trusted Sites" in the extension popup
-2. View and manage your list of trusted websites
-3. Add or remove sites from the trusted list
+5. Load in Chrome:
+- Open Chrome and go to `chrome://extensions/`
+- Enable "Developer mode"
+- Click "Load unpacked"
+- Select the `dist` folder from the project directory
 
 ## Development
-
-### Prerequisites
-- Google Chrome
-- Basic knowledge of JavaScript, HTML, and CSS
 
 ### Project Structure
 ```
 privader-web-security/
-├── manifest.json
-├── popup.html
-├── popup.js
-├── popup.css
-├── background.js
-├── content.js
-├── manage-sites.html
-└── icons/
-    ├── icon16.png
-    ├── icon48.png
-    └── icon128.png
+├── src/
+│   ├── background.js      # Service worker for background tasks
+│   ├── content.js         # Content script for webpage interaction
+│   ├── popup.js          # Popup UI functionality
+│   └── policy-analyzer.js # Privacy policy analysis logic
+├── public/
+│   ├── manifest.json      # Extension manifest
+│   ├── popup.html        # Popup UI layout
+│   └── icons/            # Extension icons
+└── dist/                 # Build output directory
 ```
 
-### Building and Testing
-1. Make your changes to the source code
-2. Load the extension in Chrome using "Load unpacked"
-3. Test all features thoroughly
-4. Submit pull requests for any improvements
+### Build Commands
+- `npm run build`: Build the extension for production
+- `npm run dev`: Build with watch mode for development
+
+## Privacy & Security Features
+
+### Site Safety Analysis
+- Checks websites against Google's Safe Browsing database
+- Verifies SSL certificates and HTTPS connections
+- Monitors for malicious content and behavior
+
+### Privacy Policy Scanner
+- Analyzes privacy policies for concerning terms
+- Categorizes privacy risks:
+  - High Risk: Data selling, location tracking, biometric data
+  - Medium Risk: Cookies, analytics, advertising
+  - Low Risk: Essential data collection, security measures
+
+### Data Protection
+- Monitors form submissions
+- Tracks data collection attempts
+- Provides warnings for excessive data gathering
 
 ## Contributing
 
@@ -92,13 +105,20 @@ privader-web-security/
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Security
+
+- Never commit API keys or sensitive information
+- Use the provided `config.template.js` for configuration
+- Always use the latest version of dependencies
+- Report security vulnerabilities responsibly
 
 ## Acknowledgments
 
-- OWASP for security guidelines
-- Chrome Extension developers for documentation
-- Contributors and testers
+- Google Safe Browsing API for threat detection
+- Chrome Extensions API
+- Various open-source libraries and tools
 
 ## Contact
 

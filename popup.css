@@ -11,6 +11,16 @@
   --danger-color: #f44336;
   --input-bg: #333333;
   --button-hover: #1976d2;
+  --bg-dark: #1a1a1a;
+  --text-light: #ffffff;
+  --text-muted: #888888;
+  --primary: #2196f3;
+  --success: #4caf50;
+  --warning: #ff9800;
+  --danger: #f44336;
+  --border: #333333;
+  --bg-card: #242424;
+  --bg-hover: #2a2a2a;
 }
 
 body {
@@ -268,61 +278,136 @@ select {
 }
 
 .policy-results {
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background: var(--bg-card);
+  border-radius: 8px;
   padding: 16px;
-  margin-top: 12px;
+  margin-top: 16px;
+}
+
+.risk-section {
+  margin-bottom: 20px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.risk-header {
+  padding: 8px 12px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.risk-header.high {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #e57373;
+  border-left: 4px solid var(--danger);
+}
+
+.risk-header.medium {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+  border-left: 4px solid var(--warning);
+}
+
+.risk-header.low {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+  border-left: 4px solid var(--success);
+}
+
+.risk-content {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+}
+
+.concern-item {
+  padding: 8px;
+  margin: 4px 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.concern-item:hover {
+  background: var(--bg-hover);
+}
+
+.concern-type {
+  font-weight: 500;
+  color: var(--text-light);
+  min-width: 120px;
+}
+
+.concern-context {
+  color: var(--text-muted);
+  flex: 1;
+  font-size: 0.9em;
+  line-height: 1.4;
 }
 
 .analysis-summary {
+  background: var(--bg-card);
+  border-radius: 6px;
+  padding: 12px;
   margin-bottom: 16px;
 }
 
 .risk-level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
-.risk-value {
-  display: inline-block;
+.risk-indicator {
   padding: 4px 8px;
   border-radius: 4px;
   font-weight: 500;
 }
 
-.risk-value.low {
-  background-color: rgba(76, 175, 80, 0.2);
-  color: #81c784;
-}
-
-.risk-value.medium {
-  background-color: rgba(255, 152, 0, 0.2);
-  color: #ffb74d;
-}
-
-.risk-value.high {
+.risk-indicator.high {
   background-color: rgba(244, 67, 54, 0.2);
   color: #e57373;
+  border: 1px solid var(--danger);
+}
+
+.risk-indicator.medium {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+  border: 1px solid var(--warning);
+}
+
+.risk-indicator.low {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+  border: 1px solid var(--success);
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 8px;
 }
 
 .stat-item {
-  background-color: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.05);
   padding: 8px;
   border-radius: 4px;
   text-align: center;
 }
 
 .stat-label {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 0.9em;
+  color: var(--text-muted);
+  font-size: 0.8em;
   margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: var(--text-light);
 }
 
 /* Scrollbar styling */
@@ -357,4 +442,180 @@ select {
   background-color: rgba(244, 67, 54, 0.1);
   border-radius: 4px;
   margin-top: 8px;
+}
+
+/* Status indicator styles */
+.status-indicator {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.status-indicator.safe {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+  border: 1px solid #4caf50;
+}
+
+.status-indicator.warning {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+  border: 1px solid #ff9800;
+}
+
+.status-indicator.danger {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #e57373;
+  border: 1px solid #f44336;
+}
+
+/* Privacy status section */
+.privacy-status {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-row:last-child {
+  margin-bottom: 0;
+}
+
+.status-label {
+  color: var(--text-muted);
+}
+
+/* Input styles */
+input {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 8px;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Results section */
+.results {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.no-concerns {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Warnings section */
+.warning-item {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.warning-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.warning-domain {
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.warning-timestamp {
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.warning-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.warning-type {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  margin-right: 8px;
+  text-transform: capitalize;
+}
+
+.warning-type.data_collection {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #e57373;
+}
+
+.warning-type.privacy_policy {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+}
+
+.warning-message {
+  flex: 1;
+}
+
+/* Filter dropdown */
+select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 6px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+/* Clear button */
+.clear-btn {
+  background-color: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.clear-btn:hover {
+  background-color: var(--danger);
+  color: white;
+}
+
+/* Analyze button */
+.analyze-button {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.analyze-button:hover {
+  background: #1976d2;
+}
+
+.analyze-button:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
 } 

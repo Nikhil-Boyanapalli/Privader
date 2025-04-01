@@ -1,5 +1,28 @@
-# Node modules
+# Dependencies
 node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build output
+dist/
+build/
+
+# Environment variables and secrets
+.env
+config.js
+secrets.js
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
 
 # Build files
 dist/
@@ -14,16 +37,6 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
-
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Environment variables
-.env
-.env.local
-.env.*.local
 
 # Chrome Extension packaging
 *.crx

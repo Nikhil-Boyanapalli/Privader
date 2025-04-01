@@ -224,4 +224,210 @@ async function checkTrustedSite(url) {
     console.error('Error checking trusted site:', error);
     return false;
   }
-} 
+}
+
+// Enhanced tracker patterns
+const TRACKER_PATTERNS = {
+  analytics: [
+    { name: 'Google Analytics', pattern: /google-analytics\.com|googletagmanager\.com/ },
+    { name: 'Facebook Pixel', pattern: /connect\.facebook\.net|facebook\.com\/tr/ },
+    { name: 'Mixpanel', pattern: /api\.mixpanel\.com/ },
+    { name: 'Hotjar', pattern: /hotjar\.com/ },
+    { name: 'Segment', pattern: /segment\.com|segment\.io/ }
+  ],
+  advertising: [
+    { name: 'Google Ads', pattern: /doubleclick\.net|googlesyndication\.com/ },
+    { name: 'Facebook Ads', pattern: /facebook\.com\/audience/ },
+    { name: 'AdRoll', pattern: /adroll\.com/ },
+    { name: 'Twitter Ads', pattern: /static\.ads-twitter\.com/ },
+    { name: 'Amazon Ads', pattern: /amazon-adsystem\.com/ }
+  ],
+  fingerprinting: [
+    { name: 'Canvas Fingerprinting', pattern: /\.toDataURL|\.getImageData/ },
+    { name: 'WebGL Fingerprinting', pattern: /\.getParameter|\.getSupportedExtensions/ },
+    { name: 'Audio Fingerprinting', pattern: /\.createOscillator|\.createAnalyser/ },
+    { name: 'Font Fingerprinting', pattern: /document\.fonts|@font-face/ }
+  ],
+  session: [
+    { name: 'Session Recording', pattern: /\.sessionstack\.com|\.hotjar\.com\/rec/ },
+    { name: 'Heatmap Tracking', pattern: /\.crazyegg\.com|\.mouseflow\.com/ }
+  ]
+};
+
+// Enhanced tracker detection
+async function detectTrackers() {
+  const trackers = {
+    analytics: [],
+    advertising: [],
+    fingerprinting: [],
+    session: []
+  };
+
+  // Check script sources
+  document.querySelectorAll('script').forEach(script => {
+    const src = script.src;
+    if (src) {
+      Object.entries(TRACKER_PATTERNS).forEach(([category, patterns]) => {
+        patterns.forEach(({ name, pattern }) => {
+          if (pattern.test(src)) {
+            trackers[category].push({
+              name,
+              source: src,
+              type: 'script'
+            });
+          }
+        });
+      });
+    }
+  });
+
+  // Check image pixels
+  document.querySelectorAll('img').forEach(img => {
+    const src = img.src;
+    if (src && img.width <= 1 && img.height <= 1) {
+      Object.entries(TRACKER_PATTERNS).forEach(([category, patterns]) => {
+        patterns.forEach(({ name, pattern }) => {
+          if (pattern.test(src)) {
+            trackers[category].push({
+              name,
+              source: src,
+              type: 'pixel'
+            });
+          }
+        });
+      });
+    }
+  });
+
+  // Check localStorage
+  Object.keys(localStorage).forEach(key => {
+    Object.entries(TRACKER_PATTERNS).forEach(([category, patterns]) => {
+      patterns.forEach(({ name, pattern }) => {
+        if (pattern.test(key)) {
+          trackers[category].push({
+            name,
+            source: key,
+            type: 'localStorage'
+          });
+        }
+      });
+    });
+  });
+
+  // Check cookies
+  document.cookie.split(';').forEach(cookie => {
+    Object.entries(TRACKER_PATTERNS).forEach(([category, patterns]) => {
+      patterns.forEach(({ name, pattern }) => {
+        if (pattern.test(cookie)) {
+          trackers[category].push({
+            name,
+            source: cookie.split('=')[0].trim(),
+            type: 'cookie'
+          });
+        }
+      });
+    });
+  });
+
+  // Monitor network requests
+  const observer = new PerformanceObserver((list) => {
+    list.getEntries().forEach(entry => {
+      const url = entry.name;
+      Object.entries(TRACKER_PATTERNS).forEach(([category, patterns]) => {
+        patterns.forEach(({ name, pattern }) => {
+          if (pattern.test(url)) {
+            trackers[category].push({
+              name,
+              source: url,
+              type: 'network'
+            });
+          }
+        });
+      });
+    });
+  });
+
+  observer.observe({ entryTypes: ['resource'] });
+
+  // Check for fingerprinting attempts
+  const fingerprintingAttempts = detectFingerprintingAttempts();
+  if (fingerprintingAttempts.length > 0) {
+    trackers.fingerprinting.push(...fingerprintingAttempts);
+  }
+
+  return {
+    trackers,
+    summary: {
+      total: Object.values(trackers).reduce((sum, arr) => sum + arr.length, 0),
+      byCategory: Object.fromEntries(
+        Object.entries(trackers).map(([category, items]) => [category, items.length])
+      )
+    }
+  };
+}
+
+// Detect fingerprinting attempts
+function detectFingerprintingAttempts() {
+  const attempts = [];
+  const originalMethods = {
+    canvas: HTMLCanvasElement.prototype.toDataURL,
+    webgl: WebGLRenderingContext.prototype.getParameter,
+    audio: AudioContext.prototype.createOscillator
+  };
+
+  // Monitor canvas fingerprinting
+  HTMLCanvasElement.prototype.toDataURL = function() {
+    attempts.push({
+      name: 'Canvas Fingerprinting',
+      source: document.currentScript?.src || 'inline script',
+      type: 'fingerprinting',
+      method: 'canvas.toDataURL'
+    });
+    return originalMethods.canvas.apply(this, arguments);
+  };
+
+  // Monitor WebGL fingerprinting
+  WebGLRenderingContext.prototype.getParameter = function() {
+    attempts.push({
+      name: 'WebGL Fingerprinting',
+      source: document.currentScript?.src || 'inline script',
+      type: 'fingerprinting',
+      method: 'webgl.getParameter'
+    });
+    return originalMethods.webgl.apply(this, arguments);
+  };
+
+  // Monitor audio fingerprinting
+  if (typeof AudioContext !== 'undefined') {
+    AudioContext.prototype.createOscillator = function() {
+      attempts.push({
+        name: 'Audio Fingerprinting',
+        source: document.currentScript?.src || 'inline script',
+        type: 'fingerprinting',
+        method: 'audio.createOscillator'
+      });
+      return originalMethods.audio.apply(this, arguments);
+    };
+  }
+
+  return attempts;
+}
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'checkTrackers') {
+    detectTrackers().then(results => {
+      sendResponse(results);
+    });
+    return true; // Keep the message channel open for async response
+  }
+});
+
+// Start monitoring immediately
+detectTrackers().then(results => {
+  // Send initial results to background script
+  chrome.runtime.sendMessage({
+    action: 'trackersDetected',
+    results
+  });
+}); 

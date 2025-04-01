@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Privader Web Security</title>
   <link rel="stylesheet" href="popup.css">
 </head>
@@ -21,6 +22,10 @@
         <div class="status-item">
           <span class="status-label">Data Collection:</span>
           <span id="data-collection" class="status-value">Checking...</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Privacy Policy:</span>
+          <span id="privacy-policy" class="status-value">Not analyzed</span>
         </div>
       </div>
       
@@ -65,7 +70,7 @@
           <option value="privacy_policy">Privacy Policy</option>
           <option value="privacy_detail">Detailed Concerns</option>
         </select>
-        <button id="clear-warnings">Clear All</button>
+        <button id="clear-warnings" class="clear-btn">Clear All</button>
       </div>
       <div id="warnings-list" class="warnings-list">
         <div class="empty-state">No warnings to display</div>
@@ -107,6 +112,7 @@
       </ul>
     </div>
   </div>
-  <script src="popup.js"></script>
+  <script src="vendor.bundle.js"></script>
+  <script src="popup.bundle.js"></script>
 </body>
 </html> 

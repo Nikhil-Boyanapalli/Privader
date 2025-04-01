@@ -2,15 +2,15 @@
   "manifest_version": 3,
   "name": "Privader Web Security",
   "version": "1.0",
-  "description": "Comprehensive web security tool for password strength testing, privacy monitoring, and site safety analysis",
+  "description": "A comprehensive web security and privacy tool",
   "permissions": [
     "activeTab",
     "storage",
     "scripting",
-    "notifications",
-    "windows",
-    "webNavigation",
+    "cookies",
     "webRequest",
+    "webNavigation",
+    "notifications",
     "downloads"
   ],
   "host_permissions": [
@@ -25,15 +25,24 @@
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.bundle.js",
+    "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
+      "js": ["vendor.bundle.js", "content.bundle.js"],
       "css": ["content.css"],
-      "js": ["content.js"]
+      "run_at": "document_end"
     }
   ],
+  "web_accessible_resources": [{
+    "resources": [
+      "vendor.bundle.js",
+      "policy-analyzer.bundle.js"
+    ],
+    "matches": ["<all_urls>"]
+  }],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
