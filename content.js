@@ -1,3 +1,7 @@
+// Global popup state
+let isPopupVisible = false;
+let hasUserContinued = false;  // Track if user has clicked continue in this session
+
 // Function to check if a site is trusted
 async function checkSiteTrust(domain) {
   try {
@@ -26,6 +30,9 @@ async function saveTrustedSite(domain) {
 
 // Function to show site trust prompt
 function showSiteTrustPrompt(domain) {
+  if (isPopupVisible || hasUserContinued) return;  // Don't show if already visible or user has continued
+  isPopupVisible = true;
+  
   const prompt = document.createElement('div');
   prompt.className = 'owasp-trust-prompt';
   prompt.innerHTML = `
@@ -48,6 +55,8 @@ function showSiteTrustPrompt(domain) {
     if (remember) {
       await saveTrustedSite(domain);
     }
+    hasUserContinued = true;  // Set the flag when user clicks continue
+    isPopupVisible = false;
     prompt.remove();
   });
 }
@@ -55,11 +64,10 @@ function showSiteTrustPrompt(domain) {
 // Monitor password fields
 function monitorPasswordFields() {
   const passwordFields = document.querySelectorAll('input[type="password"]');
-  let popupTriggered = false;
 
   passwordFields.forEach(field => {
     field.addEventListener('focus', async () => {
-      if (popupTriggered) return; // Prevent multiple triggers
+      if (hasUserContinued) return;  // Don't show popup if user has already continued
       
       const domain = window.location.hostname;
       const isTrusted = await checkSiteTrust(domain);
@@ -71,11 +79,11 @@ function monitorPasswordFields() {
 
     // Add click handler for the test password button
     field.addEventListener('click', (e) => {
-      if (popupTriggered) return; // Prevent multiple triggers
+      if (hasUserContinued) return;  // Don't show popup if user has already continued
       
       const testButton = e.target.closest('.owasp-test-button');
       if (testButton) {
-        popupTriggered = true;
+        hasUserContinued = true;  // Set the flag when user clicks test button
         const password = field.value;
         if (password) {
           chrome.runtime.sendMessage({

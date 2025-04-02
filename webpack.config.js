@@ -8,6 +8,7 @@ module.exports = {
     content: './content.js',
     background: './background.js',
     'policy-analyzer': './policy-analyzer.js',
+    'manage-sites': './manage-sites.js',
     vendor: ['zxcvbn']
   },
   output: {
@@ -47,6 +48,7 @@ module.exports = {
         { from: 'popup.html' },
         { from: 'popup.css' },
         { from: 'content.css' },
+        { from: 'manage-sites.html' },
         { from: 'icons', to: 'icons' }
       ]
     })

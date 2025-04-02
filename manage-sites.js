@@ -19,12 +19,18 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Load and display trusted sites
   async function loadTrustedSites() {
     try {
+      console.log('Loading trusted sites...');
       const result = await chrome.storage.local.get('trustedSites');
+      console.log('Loaded sites:', result);
       const trustedSites = result.trustedSites || {};
-      currentSites = Object.entries(trustedSites).map(([site, data]) => ({
+      
+      // Convert the trusted sites object to array format
+      currentSites = Object.keys(trustedSites).map(site => ({
         domain: site,
-        dateAdded: data.dateAdded || Date.now()
+        dateAdded: trustedSites[site].dateAdded || Date.now()
       }));
+      
+      console.log('Processed sites:', currentSites);
       displaySites();
     } catch (error) {
       console.error('Error loading trusted sites:', error);
@@ -35,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Display sites with current search and sort
   function displaySites() {
     let filteredSites = [...currentSites];
+    console.log('Displaying sites:', filteredSites);
     
     // Apply search filter
     const searchTerm = searchBox.value.toLowerCase();
@@ -59,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     if (filteredSites.length === 0) {
-      siteList.innerHTML = '<div class="empty-state">No matching sites found</div>';
+      siteList.innerHTML = '<div class="empty-state">No trusted sites found</div>';
       return;
     }
 
